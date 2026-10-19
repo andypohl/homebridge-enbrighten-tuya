@@ -1,0 +1,73 @@
+{
+  "pluginAlias": "EnbrightenTuya",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Local control for Enbrighten (Jasco) Wi-Fi string lights over the Tuya LAN protocol. You need each light's **device id** and **local key** (see the plugin README for the one-time lookup).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Platform Name",
+        "type": "string",
+        "default": "EnbrightenTuya",
+        "required": true
+      },
+      "devices": {
+        "title": "Lights",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "default": "Enbrighten Lights",
+              "required": true,
+              "description": "Name shown in HomeKit."
+            },
+            "id": {
+              "title": "Device ID",
+              "type": "string",
+              "required": true,
+              "description": "Tuya device id (gwId)."
+            },
+            "key": {
+              "title": "Local Key",
+              "type": "string",
+              "required": true,
+              "description": "Tuya local key for this device. Keep it private."
+            },
+            "ip": {
+              "title": "IP Address",
+              "type": "string",
+              "format": "ipv4",
+              "required": true,
+              "default": "192.168.1.182",
+              "description": "The light's LAN address. Use a static DHCP lease so it does not change."
+            },
+            "version": {
+              "title": "Protocol Version",
+              "type": "string",
+              "default": "3.3",
+              "oneOf": [
+                { "title": "3.1", "enum": ["3.1"] },
+                { "title": "3.3", "enum": ["3.3"] },
+                { "title": "3.4", "enum": ["3.4"] },
+                { "title": "3.5", "enum": ["3.5"] }
+              ],
+              "required": true,
+              "description": "Tuya protocol version (the local-key lookup tool reports this)."
+            },
+            "dpPower": {
+              "title": "Power Datapoint",
+              "type": "integer",
+              "default": 20,
+              "required": true,
+              "description": "Tuya DP that toggles power. Usually 20 for lighting devices, sometimes 1. Check the Homebridge log line 'datapoints seen' after first connect."
+            }
+          }
+        }
+      }
+    }
+  }
+}

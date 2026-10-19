@@ -1,0 +1,26 @@
+{
+  "name": "homebridge-enbrighten-tuya",
+  "displayName": "Enbrighten Tuya (local)",
+  "version": "0.1.0",
+  "description": "Local-network HomeKit control for Enbrighten (Jasco) Wi-Fi string lights via the Tuya LAN protocol. On/off now, with room to grow into brightness and scenes.",
+  "license": "MIT",
+  "main": "index.js",
+  "engines": {
+    "homebridge": ">=1.6.0 || ^2.0.0-beta.0",
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "enbrighten",
+    "jasco",
+    "tuya",
+    "string-lights",
+    "homekit"
+  ],
+  "dependencies": {
+    "tuyapi": "^7.5.1"
+  },
+  "scripts": {
+    "test": "node --check index.js"
+  }
+}
