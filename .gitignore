@@ -5,3 +5,7 @@ npm-debug.log*
 devices.json
 tinytuya.json
 .env
+
+.venv/
+.secrets/
+*.env
