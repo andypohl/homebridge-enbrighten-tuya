@@ -7,9 +7,8 @@ light directly on your LAN (TCP 6668, Tuya protocol), so control does not depend
 on the Tuya cloud or the internet once it is set up. That suits a segmented
 network where the lights live on an IoT VLAN.
 
-**Scope today:** on/off power.
-**Designed to grow into:** brightness and scene selection (the Tuya datapoints
-for those are noted at the end).
+**Scope today:** on/off, brightness, and colour (hue/saturation, plus whites).
+**Planned:** scene selection (see the roadmap at the end).
 
 ---
 
@@ -105,22 +104,30 @@ On the first successful connection the plugin logs one line like:
 The boolean that flips with on/off is your power DP. For Tuya lighting devices
 it is almost always `20`; some simpler devices use `1`. Set `dpPower` to match.
 
-## Roadmap: brightness and scenes
+## How control is encoded (and the scene roadmap)
 
-Tuya lighting devices expose a standard datapoint set. When you want more than
-on/off, these are the ones to map:
+Unlike most Tuya lights, these string lights do **not** expose separate
+brightness/colour DPs. Everything rides one packed datapoint, **DP106
+(`control_data`)**, in this form:
 
-| DP  | Function        | HomeKit mapping |
-|-----|-----------------|-----------------|
-| 20  | on/off          | Lightbulb `On` (done) |
-| 22  | brightness      | Lightbulb `Brightness` (scale 10–1000) |
-| 21  | work mode       | `white` / `colour` / `scene` / `music` |
-| 24  | colour (HSV)    | `Hue` + `Saturation` |
-| 25  | scene data      | expose scenes as switches or a selector |
+```
+00 03e8 BBBB 0 # WW RR GG BB
+```
 
-The code in `index.js` is organized so each of these becomes an added
-characteristic on the existing `Lightbulb` service (or a separate service for
-scene switches) without restructuring.
+- `BBBB` — brightness, `0000`–`03e8` (0–1000) -> HomeKit `Brightness`
+- `WW RR GG BB` — White + R/G/B bytes -> HomeKit `Hue` + `Saturation`
+  (whites are produced via RGB; the warm-white `W` channel is read but not driven)
+
+Power is a separate boolean on **DP20**. White colour-temperature swatches in the
+app are just specific `WW RR GG BB` values, so HomeKit colour covers them.
+
+**Scenes** (the app's "Mode" presets) use a *different* packed form on the same DP
+— prefix `40`, no `#color` (e.g. `4001f403e8`) — and are not wired to HomeKit yet.
+The plan is capture-and-replay: record each scene's string and expose saved scenes
+as switches.
+
+Set `debugDatapoints: true` on a device to log every datapoint change, which is how
+the DP106 format above was reverse-engineered (`tools/dp_monitor.py` helps too).
 
 ## License
 

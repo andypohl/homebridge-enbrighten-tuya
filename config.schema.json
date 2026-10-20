@@ -2,7 +2,7 @@
   "pluginAlias": "EnbrightenTuya",
   "pluginType": "platform",
   "singular": true,
-  "headerDisplay": "Local control for Enbrighten (Jasco) Wi-Fi string lights over the Tuya LAN protocol. You need each light's **device id** and **local key** (see the plugin README for the one-time lookup).",
+  "headerDisplay": "Local control (on/off, brightness, and colour) for Enbrighten (Jasco) Wi-Fi string lights over the Tuya LAN protocol. You need each light's **device id** and **local key** (see the plugin README for the one-time lookup).",
   "schema": {
     "type": "object",
     "properties": {
@@ -50,10 +50,30 @@
               "type": "string",
               "default": "3.3",
               "oneOf": [
-                { "title": "3.1", "enum": ["3.1"] },
-                { "title": "3.3", "enum": ["3.3"] },
-                { "title": "3.4", "enum": ["3.4"] },
-                { "title": "3.5", "enum": ["3.5"] }
+                {
+                  "title": "3.1",
+                  "enum": [
+                    "3.1"
+                  ]
+                },
+                {
+                  "title": "3.3",
+                  "enum": [
+                    "3.3"
+                  ]
+                },
+                {
+                  "title": "3.4",
+                  "enum": [
+                    "3.4"
+                  ]
+                },
+                {
+                  "title": "3.5",
+                  "enum": [
+                    "3.5"
+                  ]
+                }
               ],
               "required": true,
               "description": "Tuya protocol version (the local-key lookup tool reports this)."
@@ -64,6 +84,18 @@
               "default": 20,
               "required": true,
               "description": "Tuya DP that toggles power. Usually 20 for lighting devices, sometimes 1. Check the Homebridge log line 'datapoints seen' after first connect."
+            },
+            "dpControl": {
+              "title": "Control Datapoint",
+              "type": "integer",
+              "default": 106,
+              "description": "Tuya DP carrying packed brightness + colour (control_data). Default 106 for these lights. Only change if the 'datapoints seen' log line shows a different packed DP."
+            },
+            "debugDatapoints": {
+              "title": "Log All Datapoint Updates",
+              "type": "boolean",
+              "default": false,
+              "description": "Verbose: log every datapoint change to the Homebridge log. Useful for reverse-engineering new models; leave off in normal use."
             }
           }
         }
