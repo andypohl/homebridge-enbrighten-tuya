@@ -35,7 +35,7 @@ TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 TGZ="$($NPM pack "$SRC" --pack-destination "$TMP" --loglevel=error | tail -1)"
 mkdir -p "$TMP/extract"
 tar xzf "$TMP/$TGZ" -C "$TMP/extract" --strip-components=1
-( cd "$TMP/extract" && $NPM install --omit=dev --no-audit --no-fund --loglevel=error )
+( cd "$TMP/extract" && $NPM install --omit=dev --ignore-scripts --no-audit --no-fund --loglevel=error )
 VER="$($NODE -e "console.log(require('$TMP/extract/package.json').version)")"
 
 # 2) Atomic-ish swap into the dedicated deploy dir, owned by homebridge.

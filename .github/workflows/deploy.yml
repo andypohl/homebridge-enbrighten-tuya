@@ -1,0 +1,48 @@
+# CI/CD for homebridge-enbrighten-tuya.
+#
+# - On push to main (or manual dispatch): deploy to the local Homebridge via a
+#   SELF-HOSTED runner on homebridgerton. The deploy installs a self-contained
+#   copy into the separate /var/lib/homebridge/custom dir (tools/deploy.sh) and
+#   restarts Homebridge.
+# - On a published GitHub Release: publish to npm (homebridge.io) from a
+#   GitHub-hosted runner. Needs the NPM_TOKEN repo secret (door left open).
+name: CI / Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+  release:
+    types: [ published ]
+
+jobs:
+  deploy:
+    name: Deploy to Homebridge (self-hosted)
+    if: github.event_name != 'release'
+    runs-on: [self-hosted, linux, homebridge]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate (syntax)
+        run: |
+          /opt/homebridge/bin/node --check index.js
+          /opt/homebridge/bin/node --check tools/local_test.js
+      - name: Deploy to Homebridge
+        # deploy.sh needs root (writes under /var/lib/homebridge, restarts the
+        # service). The runner user has scoped, passwordless sudo for exactly
+        # this script path; deploy.sh runs npm with --ignore-scripts.
+        run: sudo /bin/bash "$GITHUB_WORKSPACE/tools/deploy.sh" "$GITHUB_WORKSPACE"
+
+  publish:
+    name: Publish to npm (homebridge.io)
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install --ignore-scripts --no-audit --no-fund
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
