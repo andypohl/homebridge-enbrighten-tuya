@@ -9,3 +9,6 @@ tinytuya.json
 .venv/
 .secrets/
 *.env
+apikey.txt
+__pycache__/
+*.pyc
